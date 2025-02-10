@@ -1,4 +1,3 @@
-# Template
+# Project: HashMap
 
-This is my template repository for future projects with
-JavaScript.
+This is my HashMap project for The Odin Project.
