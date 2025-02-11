@@ -19,6 +19,13 @@ class HashMap {
         
         return hashCode;
     }
+
+    set(key, value) {
+        let hashedKey = this.hash(key);
+        this.array[hashedKey] = value;
+        console.log(this.array);
+        console.log(hashedKey + " " +  value);
+    }
 }
 
 export {HashMap};
