@@ -36,6 +36,17 @@ class HashMap {
         }
         return this.array[hashedKey];
     }
+
+    has(key) {
+        let hashedKey = this.hash(key);
+        if (hashedKey < 0 || hashedKey >= this.array.length) {
+            throw new Error("Trying to access index out of bounds");
+        } else if (this.array[hashedKey] === -1) {
+            return false;
+        }
+        return true;
+    }
+
 }
 
 export {HashMap};
