@@ -32,15 +32,27 @@ class HashMap {
         // If the bucket exists
         if (bucket) {
             /*
-            If the bucket's head does not have  a key, make a node.
+            If the bucket's head does not have a key, make a node.
             Else, change the value of the key.
             */
             if (!bucket.head.key) {
                 bucket = new Node(key, value);
-            } else if (bucket.head.key !== key) {
-                bucket.append(key, value);
             } else {
-                bucket.head.value = value;
+                let current = bucket.head;
+                if (current.key === key) {
+                    current.value = value;
+                }
+
+                while (current.nextNode) {
+                    if (current.nextNode.key === key) {
+                        current.nextNode.value = value;
+                    }
+                    current = current.nextNode;
+                }
+
+                if (current.key !== key) {
+                    bucket.append(key, value);
+                }
             }
 
         } else {
@@ -53,10 +65,7 @@ class HashMap {
     }
 
     get(key) {
-        let hashedKey = this.hash(key);
-        if (!this.buckets[hashedKey]) {
-            return null;
-        }
+        this.checkIndex(this.hash(key));
 
         for (let bucket in this.buckets) {
             if (this.buckets[bucket].head.key === key) {
@@ -76,6 +85,8 @@ class HashMap {
     }
 
     has(key) {
+        this.checkIndex(this.hash(key));
+
         for (let bucket in this.buckets) {
             if (this.buckets[bucket].head.key === key) {
                 return true;
@@ -94,32 +105,94 @@ class HashMap {
     }
 
     remove(key) {
+        this.checkIndex(this.hash(key));
+
         for (let bucket in this.buckets) {
-            if (this.buckets[bucket].head.key === key) {
+            if (this.buckets[bucket].head.key === key && this.buckets[bucket].getSize() === 1) {
                 return true;
             }
         }
+
+        return false;
     }
 
     length() {
         let counter = 0;
-        for (let i = 0; i < this.buckets.length; i++) {
-            if (this.buckets[i] !== -1) {
+        for (let bucket in this.buckets) {
+            if (this.buckets[bucket]) {
                 counter++;
+                let current = this.buckets[bucket].head;
+                while (current.nextNode) {
+                    if (current.nextNode) {
+                        counter++;
+                    }
+                    current = current.nextNode;
+                }
             }
         }
         
         return counter;
     }
 
+    clear() {
+       this.buckets.length = 0;
+    }
+
     keys() {
         let keyArray = [];
 
-        for (let key in this.buckets) {
-            keyArray.push(key);
+        for (let bucket in this.buckets) {
+            if (this.buckets[bucket]) {
+                let current = this.buckets[bucket].head;
+                keyArray.push(current.key);
+                while (current.nextNode) {
+                    if (current.nextNode) {
+                        keyArray.push(current.nextNode.key);
+                    }
+                    current = current.nextNode;
+                }
+            }
         }
 
         return keyArray;
+    }
+
+    values() {
+        let valueArray = [];
+
+        for (let bucket in this.buckets) {
+            if (this.buckets[bucket]) {
+                let current = this.buckets[bucket].head;
+                valueArray.push(current.value);
+                while (current.nextNode) {
+                    if (current.nextNode) {
+                        valueArray.push(current.nextNode.value);
+                    }
+                    current = current.nextNode;
+                }
+            }
+        }
+
+        return valueArray;
+    }
+
+    entries() {
+        let entryArray = [];
+
+        for (let bucket in this.buckets) {
+            if (this.buckets[bucket]) {
+                let current = this.buckets[bucket].head;
+                entryArray.push([current.key, current.value]);
+                while (current.nextNode) {
+                    if (current.nextNode) {
+                        entryArray.push([current.nextNode.key, current.nextNode.value]);
+                    }
+                    current = current.nextNode;
+                }
+            }
+        }
+
+        return entryArray;
     }
 }
 
