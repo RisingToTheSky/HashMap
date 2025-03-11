@@ -11,7 +11,7 @@ class LinkedList {
 		let node = new Node(key, value);
 		let current;
 
-		if (this.head == null) {
+		if (this.size === 0) {
 			this.head = node;
 			this.size++;
 		} else {
@@ -29,7 +29,7 @@ class LinkedList {
 		let node = new Node(key, value);
 		let current;
 
-		if (this.head == null) {
+		if (this.size === 0) {
 			this.head = node;
 			this.size++;
 		} else {
@@ -85,21 +85,26 @@ class LinkedList {
 
 	pop() {
 		let current = this.head;
+		let counter = 0;
 
-		if (!current.nextNode) {
-			return null;
+		if (!current.nextNode && current.value === this.at(this.size - 1).value) {
+			current.key = null;
+			current.value = null;
+			current = null;
+			this.size--;
+			return current;
 		}
 
 		while (current.nextNode) {
-			if (current.nextNode.value === this.at(this.size - 1).value) {
+			if (counter === this.size - 2) {
 				current.nextNode = null;
 				this.size--;
 				return current;
 			}
 			current = current.nextNode;
+			counter++;
 		}
 		
-
 		return current;
 	}
 

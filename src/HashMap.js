@@ -60,8 +60,6 @@ class HashMap {
             bucket.prepend(key, value);
             this.buckets[hashedKey] = bucket;
         }
-        
-        console.log(key + " " + hashedKey + " " +  value);
     }
 
     get(key) {
@@ -105,15 +103,47 @@ class HashMap {
     }
 
     remove(key) {
-        this.checkIndex(this.hash(key));
+        let hashedKey = this.hash(key);
+        this.checkIndex(hashedKey);
+
+        if (!this.keys().includes(key)) {
+            return false;
+        }
 
         for (let bucket in this.buckets) {
-            if (this.buckets[bucket].head.key === key && this.buckets[bucket].getSize() === 1) {
+            let linkedList = this.buckets[bucket];;
+            let prevNode;
+
+            if (this.buckets[bucket].head.key === key && linkedList.getSize() === 1) {
+                linkedList.pop();
+                this.buckets.splice(hashedKey, 1);
                 return true;
+            }
+
+            if (this.buckets[bucket].head.key === key) {
+                prevNode = this.buckets[bucket].head;
+
+                this.buckets[bucket].head = this.buckets[bucket].head.nextNode;
+
+                prevNode = null;
+                linkedList.size--;
+                return true;
+            } else {
+                let current = this.buckets[bucket].head;
+
+                while (current.nextNode) {
+                    if (current.nextNode.key === key) {
+                        current.nextNode = current.nextNode.nextNode;
+                        linkedList.size--;
+                        return true;
+                    }
+
+                    current = current.nextNode;
+                }
             }
         }
 
-        return false;
+        return true;
     }
 
     length() {
