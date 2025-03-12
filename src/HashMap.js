@@ -2,8 +2,8 @@ import { LinkedList } from "./LinkedList";
 import { Node } from "./Node";
 class HashMap {
     constructor () {
-        this.loadFactor = 0.75;
         this.capacity = 16;
+        this.loadFactor = this.capacity * 0.75;
         this.buckets = new Array(this.capacity);
     }   
 
@@ -26,9 +26,30 @@ class HashMap {
     }
 
     set(key, value) {
-        let hashedKey = this.hash(key);
+        if (this.keys().includes(key)) {
+            this.checkCollision(key, value, this.hash(key));
+            return;
+        } else if (this.length() === this.loadFactor) {
+            if (this.length() === this.loadFactor) {
+                this.capacity *= 2;
+                this.loadFactor = 0.75 * this.capacity;
+                let entries = this.entries();
+                this.clear();
+                this.buckets = new Array(this.capacity);
+                for (let entry in entries) {
+                    let hashedKey = this.hash(entries[entry][0]);
+                    this.checkCollision(entries[entry][0],entries[entry][1], hashedKey)
+                }
+            }
+
+            this.checkCollision(key, value, this.hash(key));
+        } else {
+            this.checkCollision(key, value, this.hash(key));
+        }
+    }
+
+    checkCollision(key, value, hashedKey) {
         let bucket = this.buckets[hashedKey];
-        
         // If the bucket exists
         if (bucket) {
             /*
@@ -116,7 +137,6 @@ class HashMap {
 
             if (this.buckets[bucket].head.key === key && linkedList.getSize() === 1) {
                 linkedList.pop();
-                this.buckets.splice(hashedKey, 1);
                 return true;
             }
 
@@ -147,21 +167,7 @@ class HashMap {
     }
 
     length() {
-        let counter = 0;
-        for (let bucket in this.buckets) {
-            if (this.buckets[bucket]) {
-                counter++;
-                let current = this.buckets[bucket].head;
-                while (current.nextNode) {
-                    if (current.nextNode) {
-                        counter++;
-                    }
-                    current = current.nextNode;
-                }
-            }
-        }
-        
-        return counter;
+        return this.keys().length;
     }
 
     clear() {
@@ -174,7 +180,9 @@ class HashMap {
         for (let bucket in this.buckets) {
             if (this.buckets[bucket]) {
                 let current = this.buckets[bucket].head;
-                keyArray.push(current.key);
+                if (current.key !== null) {
+                    keyArray.push(current.key);
+                }
                 while (current.nextNode) {
                     if (current.nextNode) {
                         keyArray.push(current.nextNode.key);
@@ -193,7 +201,9 @@ class HashMap {
         for (let bucket in this.buckets) {
             if (this.buckets[bucket]) {
                 let current = this.buckets[bucket].head;
-                valueArray.push(current.value);
+                if (current.value !== null) {
+                    valueArray.push(current.value);
+                }
                 while (current.nextNode) {
                     if (current.nextNode) {
                         valueArray.push(current.nextNode.value);
@@ -212,7 +222,9 @@ class HashMap {
         for (let bucket in this.buckets) {
             if (this.buckets[bucket]) {
                 let current = this.buckets[bucket].head;
-                entryArray.push([current.key, current.value]);
+                if (current.key !== null && current.value !== null) {
+                    entryArray.push([current.key, current.value]);
+                }
                 while (current.nextNode) {
                     if (current.nextNode) {
                         entryArray.push([current.nextNode.key, current.nextNode.value]);
